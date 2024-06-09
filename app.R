@@ -4,7 +4,7 @@
 ### --> requires atmosch-R :
 ###       https://github.com/rs028/atmosch-R/
 ###
-### version 0.9, May 2021
+### version 0.9.1, June 2024
 ### author: RS
 ### ---------------------------------------------------------------- ###
 
@@ -30,7 +30,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
                   ## first panel (main variables)
                   tabPanel("Main", fluid=TRUE,
                            sidebarLayout(position="right",
-                                         ## side window
+                                         ## main side window
                                          sidebarPanel(width=3,
                                                       numericInput(inputId="start1",
                                                                    label="hours displayed:",
@@ -50,17 +50,25 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                       sliderInput(inputId="range1",
                                                                   label="ozone range:",
                                                                   min=0,
-                                                                  max=200,
+                                                                  max=300,
                                                                   step=5,
                                                                   value=c(0,150)
                                                       ),
                                                       hr(style="border-color:black; border-width:3px;"),
-                                                      h4("reactivity (s-1):"),
+                                                      h4("ozone reactivity (s-1):"),
                                                       h5(textOutput("reac1")),
-                                                      h4("a-pinene (ppb):"),
-                                                      h5(textOutput("bvoc1"))
+                                                      h5("equivalent to mixing ratio (ppb):"),
+                                                      radioButtons(inputId="spec",
+                                                                   label="",
+                                                                   choices=c("NO",
+                                                                             "isoprene",
+                                                                             "a-pinene",
+                                                                             "limonene"),
+                                                                   selected="a-pinene"
+                                                                   ),
+                                                      h6(textOutput("spec.mr"))
                                          ),
-                                         ## plot window
+                                         ## main plot window
                                          mainPanel(width=9,
                                                    plotOutput(outputId="mainPlot")
                                          )
@@ -71,7 +79,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
                   ## second panel (diagnostic variables)
                   tabPanel("Diagnostic", fluid=TRUE,
                            sidebarLayout(position="right",
-                                         ## side window
+                                         ## diagnostic side window
                                          sidebarPanel(width=3,
                                                       numericInput(inputId="start2",
                                                                    label="hours displayed:",
@@ -88,7 +96,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                                    selected="INTENSITY"
                                                       )
                                          ),
-                                         ## plot window
+                                         ## diagnostic plot window
                                          mainPanel(width=9,
                                                    plotOutput(outputId="secondPlot")
                                          )
@@ -96,13 +104,13 @@ ui <- fluidPage(theme=shinytheme("paper"),
                   ),
 
                   ## ------------------ ##
-                  ## third panel (configuration variables)
+                  ## third panel (system configuration)
                   tabPanel("Configuration", fluid=TRUE,
                            fluidRow(br(),
                              column(width=6,
                                     textInput(inputId="dir3",
                                               label="data directory",
-                                              value="~/Work/TORS/phase4_waseda/"
+                                              value="~/TORS/phase4_waseda/"
                                     ),
                                     textInput(inputId="dat3",
                                               label="experiment directory",
@@ -118,6 +126,30 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                     )
                              ),
                              column(width=6,
+                                    numericInput(inputId="time3",
+                                                 label="residence time (s):",
+                                                 step=1,
+                                                 value=128
+                                    ),
+                                    numericInput(inputId="temp3",
+                                                 label="temperature (C):",
+                                                 step=1,
+                                                 value=25
+                                    ),
+                                    numericInput(inputId="pres3",
+                                                 label="pressure (mbar):",
+                                                 step=1,
+                                                 value=1013
+                                    )
+                             )
+                           )
+                  ),
+
+                  ## ------------------ ##
+                  ## fourth panel (system variables)
+                  tabPanel("System", fluid=TRUE,
+                           fluidRow(br(),
+                                    column(width=6,
                                     numericInput(inputId="time3",
                                                  label="residence time (s):",
                                                  step=1,
@@ -157,11 +189,26 @@ server <- function(input, output, session) {
     ## calculate ozone reactivity
     df.box$delta <- df.box$o3_1 - df.box$o3_2
     df.box$reactivity <- -log(df.box$o3_2 / df.box$o3_1) / input$time3
-    ## calculate a-pinene equivalent concentration
+    ## calculate temperature and pressure in standard units
     temp.k <- fConvTemp(input$temp3, "C", "K")
     pres.pa <- fConvPress(input$pres3, "mbar", "Pa")
-    df.box$apinene <- df.box$reactivity/fKBi(8.22e-16, -640, temp.k)[[1]]
-    df.box$apinene.ppb <- fConcGas(df.box$apinene, "ND", "ppb", temp.k, pres.pa)
+    ## calculate rate coefficient of ozonolysis reaction
+    switch(input$spec,
+           "NO"={
+             rate.coeff <- fKBi(2.07e-12, -1400, temp.k)[[1]]
+           },
+           "isoprene"={
+             rate.coeff <- fKBi(1.05e-14, -2000, temp.k)[[1]]
+           },
+           "a-pinene"={
+             rate.coeff <- fKBi(8.22e-16, -640, temp.k)[[1]]
+           },
+           "limonene"={
+             rate.coeff <- fKBi(2.91e-15, -770, temp.k)[[1]]
+           })
+    ## calculate equivalent mixing ratio for selected species
+    df.box$species <- df.box$reactivity/rate.coeff
+    df.box$species.ppb <- fConcGas(df.box$species, "ND", "ppb", temp.k, pres.pa)
     return(df.box)
   })
 
@@ -176,13 +223,13 @@ server <- function(input, output, session) {
   })
 
   ## ------------------ ##
-  ## calculate average a-pinene equivalent concentration (5 minutes)
-  output$bvoc1 <- renderText({
+  ## calculate average equivalent mixing ratio (5 minutes)
+  output$spec.mr <- renderText({
     az <- nrow(df.data())
     aa <- az - 5
     aa <- ifelse(aa>0, aa, 1)
-    bvoc.ppb <- mean(df.data()$apinene.ppb[aa:az], na.rm=TRUE)
-    format(bvoc.ppb, digits=4, scientific=FALSE)
+    spec.mr <- mean(df.data()$species.ppb[aa:az], na.rm=TRUE)
+    format(no.ppb, digits=4, scientific=FALSE)
   })
 
   ## ------------------ ##
@@ -213,7 +260,7 @@ server <- function(input, output, session) {
     legend("topleft", c("box1","box2"), col=c("darkblue","darkred"),
            lty=1, pch=1, ncol=2, bg="white", inset=0.03 , cex=2.5)
     plot(xt[aa:az], y4[aa:az], type="b", col="darkorchid",
-         ylim=c(-6,6), cex=1.5, cex.main=2.5, cex.axis=1.5,
+         ylim=c(-10,10), cex=1.5, cex.main=2.5, cex.axis=1.5,
          main=expression(Delta*"(O"[3]*")"), xlab="", ylab="")
     grid(); abline(h=0, lty=2)
   }, height=800, width=900)
