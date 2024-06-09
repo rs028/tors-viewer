@@ -38,42 +38,42 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                                    max=72,
                                                                    step=1,
                                                                    value=6
-                                                      ),
+                                                                   ),
                                                       textInput(inputId="min1",
                                                                 label="minimum reactivity:",
                                                                 value=0
-                                                      ),
+                                                                ),
                                                       textInput(inputId="max1",
                                                                 label="maximum reactivity:",
                                                                 value=1e-3
-                                                      ),
+                                                                ),
                                                       sliderInput(inputId="range1",
                                                                   label="ozone range:",
                                                                   min=0,
                                                                   max=300,
                                                                   step=5,
                                                                   value=c(0,150)
-                                                      ),
+                                                                  ),
                                                       hr(style="border-color:black; border-width:3px;"),
-                                                      h4("ozone reactivity (s-1):"),
-                                                      h5(textOutput("reac1")),
-                                                      h5("equivalent to mixing ratio (ppb):"),
+                                                      h5("ozone reactivity (s-1):"),
+                                                      h6(textOutput("reac1")),
+                                                      h6("equivalent to mixing ratio (ppb):"),
                                                       radioButtons(inputId="spec",
                                                                    label="",
                                                                    choices=c("NO",
                                                                              "isoprene",
                                                                              "a-pinene",
                                                                              "limonene"),
-                                                                   selected="a-pinene"
+                                                                   selected="a-pinene",
                                                                    ),
                                                       h6(textOutput("spec.mr"))
-                                         ),
+                                                      ),
                                          ## main plot window
                                          mainPanel(width=9,
                                                    plotOutput(outputId="mainPlot")
+                                                   )
                                          )
-                           )
-                  ),
+                           ),
 
                   ## ------------------ ##
                   ## second panel (diagnostic variables)
@@ -86,7 +86,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                                    min=1,
                                                                    max=72,
                                                                    value=6
-                                                      ),
+                                                                   ),
                                                       radioButtons(inputId="var2",
                                                                    label="diagnostic variables:",
                                                                    choices=c("INTENSITY",
@@ -94,84 +94,127 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                                              "FLOW",
                                                                              "PRESSURE"),
                                                                    selected="INTENSITY"
-                                                      )
-                                         ),
+                                                                   )
+                                                      ),
                                          ## diagnostic plot window
                                          mainPanel(width=9,
                                                    plotOutput(outputId="secondPlot")
+                                                   )
                                          )
-                           )
-                  ),
+                           ),
 
                   ## ------------------ ##
-                  ## third panel (system configuration)
-                  tabPanel("Configuration", fluid=TRUE,
-                           fluidRow(br(),
-                             column(width=6,
-                                    textInput(inputId="dir3",
-                                              label="data directory",
-                                              value="~/TORS/phase4_waseda/"
-                                    ),
-                                    textInput(inputId="dat3",
-                                              label="experiment directory",
-                                              value="raw/"
-                                    ),
-                                    textInput(inputId="one3",
-                                              label="box1",
-                                              value="teraterm1_181201"
-                                    ),
-                                    textInput(inputId="two3",
-                                              label="box2",
-                                              value="teraterm2_181201"
-                                    )
-                             ),
-                             column(width=6,
-                                    numericInput(inputId="time3",
-                                                 label="residence time (s):",
-                                                 step=1,
-                                                 value=128
-                                    ),
-                                    numericInput(inputId="temp3",
-                                                 label="temperature (C):",
-                                                 step=1,
-                                                 value=25
-                                    ),
-                                    numericInput(inputId="pres3",
-                                                 label="pressure (mbar):",
-                                                 step=1,
-                                                 value=1013
-                                    )
-                             )
-                           )
-                  ),
-
-                  ## ------------------ ##
-                  ## fourth panel (system variables)
+                  ## third panel (system variables)
                   tabPanel("System", fluid=TRUE,
                            fluidRow(br(),
                                     column(width=6,
-                                    numericInput(inputId="time3",
-                                                 label="residence time (s):",
-                                                 step=1,
-                                                 value=128
-                                    ),
-                                    numericInput(inputId="temp3",
-                                                 label="temperature (C):",
-                                                 step=1,
-                                                 value=25
-                                    ),
-                                    numericInput(inputId="pres3",
-                                                 label="pressure (mbar):",
-                                                 step=1,
-                                                 value=1013
+                                           numericInput(inputId="mfc1.set",
+                                                        label="set O3 lamp",
+                                                        min=0,
+                                                        max=0.5,
+                                                        step=0.01,
+                                                        value=0.5
+                                                        ),
+                                           h6(textOutput("mfc1.read")),
+                                           numericInput(inputId="mfc2.set",
+                                                        label="set ZA dilution",
+                                                        min=0,
+                                                        max=2,
+                                                        step=0.1,
+                                                        value=1.2
+                                                        ),
+                                           h6(textOutput("mfc2.read")),
+                                           numericInput(inputId="mfc3.set",
+                                                        label="set OH scrubber",
+                                                        min=0,
+                                                        max=0.5,
+                                                        step=0.01,
+                                                        value=0
+                                                        ),
+                                           h6(textOutput("mfc3.read")),
+                                           numericInput(inputId="mfc4.set",
+                                                        label="set background",
+                                                        min=0,
+                                                        max=5,
+                                                        step=0.1,
+                                                        value=5
+                                                        ),
+                                           h6(textOutput("mfc4.read")),
+                                           numericInput(inputId="mfc5.set",
+                                                        label="set pump",
+                                                        min=0,
+                                                        max=5,
+                                                        step=0.1,
+                                                        value=1
+                                                        ),
+                                           h6(textOutput("mfc5.read"))
+                                           ),
+                                    column(width=6,
+                                           h5("sample flow (slpm):"),
+                                           h6(textOutput("sample")),
+                                           #h5("residence time (s):"),
+                                           #h6(textOutput("sample")),
+                                           h5("vent flow (slpm):"),
+                                           h6(textOutput("vent"))
+                                           )
                                     )
-                             )
+                           ),
+
+                  ## ------------------ ##
+                  ## fourth panel (configuration info)
+                  tabPanel("Configuration", fluid=TRUE,
+                           fluidRow(br(),
+                                    column(width=6,
+                                           textInput(inputId="dir4",
+                                                     label="data directory",
+                                                     value="~/TORS/phase4_waseda/"
+                                                     ),
+                                           textInput(inputId="dat4",
+                                                     label="experiment directory",
+                                                     value="raw/"
+                                                     ),
+                                           textInput(inputId="one4",
+                                                     label="box1",
+                                                     value="teraterm1_181201"
+                                                     ),
+                                           textInput(inputId="two4",
+                                                     label="box2",
+                                                     value="teraterm2_181201"
+                                                     )
+                                           ),
+                                    column(width=6,
+                                           numericInput(inputId="time3",
+                                                        label="residence time (s):",
+                                                        step=1,
+                                                        value=128
+                                                        ),
+                                           numericInput(inputId="temp3",
+                                                        label="temperature (C):",
+                                                        step=1,
+                                                        value=25
+                                                        ),
+                                           numericInput(inputId="pres3",
+                                                        label="pressure (mbar):",
+                                                        step=1,
+                                                        value=1013
+                                                        ),
+                                           numericInput(inputId="monit1",
+                                                        label="box 1 flow (slpm):",
+                                                        step=0.1,
+                                                        value=0.9
+                                                        ),
+                                           numericInput(inputId="monit2",
+                                                        label="box 2 flow (slpm):",
+                                                        step=0.1,
+                                                        value=0.9
+                                                        )
+                                           )
+                                    )
                            )
-                  )
 
-                )  # --- end tabsetPanel --- #
+                      )  # --- end tabsetPanel --- #
 
-)  # --- end fluidPage --- #
+                )  # --- end fluidPage --- #
 
 ## ------------------------------------------------------------------ ##
 ## SERVER section
@@ -183,8 +226,8 @@ server <- function(input, output, session) {
   df.data <- reactive({
     invalidateLater(60000, session)
     ## read data files
-    box1 <- fRead_Thermo(paste(input$dir3, input$dat3, sep=""), input$one3, "49i")
-    box2 <- fRead_Thermo(paste(input$dir3, input$dat3, sep=""), input$two3, "49i")
+    box1 <- fRead_Thermo(paste(input$dir4, input$dat4, sep=""), input$one4, "49i")
+    box2 <- fRead_Thermo(paste(input$dir4, input$dat4, sep=""), input$two4, "49i")
     df.box <- merge(box1, box2, by="Datetime", suffixes=c("_1","_2"))
     ## calculate ozone reactivity
     df.box$delta <- df.box$o3_1 - df.box$o3_2
@@ -229,7 +272,7 @@ server <- function(input, output, session) {
     aa <- az - 5
     aa <- ifelse(aa>0, aa, 1)
     spec.mr <- mean(df.data()$species.ppb[aa:az], na.rm=TRUE)
-    format(no.ppb, digits=4, scientific=FALSE)
+    format(spec.mr, digits=4, scientific=FALSE)
   })
 
   ## ------------------ ##
@@ -322,6 +365,51 @@ server <- function(input, output, session) {
          main=str.b, xlab="", ylab="BOX 2")
     grid()
   }, height=800, width=900)
+
+  ## ------------------ ##
+  ## Flows
+  output$mfc1.read <- renderText({
+    mfc1 <- (input$mfc1.set * 0.952) + 0.0036   # O3 lamp
+    paste("read =", mfc1)
+  })
+
+  output$mfc2.read <- renderText({
+    mfc2 <- (input$mfc2.set * 0.989) - 0.0421   # ZA dilution
+    paste("read =", mfc2)
+  })
+
+  output$mfc3.read <- renderText({
+    mfc3 <- (input$mfc3.set * 1.0134) - 0.0024  # OH scrubber
+    paste("read =", mfc3)
+  })
+
+  output$mfc4.read <- renderText({
+    mfc4 <- (input$mfc4.set * 0.869) - 0.0539   # background
+    paste("read =", mfc4)
+  })
+
+  output$mfc5.read <- renderText({
+    mfc5 <- (input$mfc5.set * 0.7188) + 0.0227  # pump
+    paste("read =", mfc5)
+  })
+
+  output$sample <- renderText({
+    mfc1 <- (input$mfc1.set * 0.952) + 0.0036
+    mfc2 <- (input$mfc2.set * 0.989) - 0.0421
+    mfc3 <- (input$mfc3.set * 1.0134) - 0.0024
+    mfc5 <- (input$mfc5.set * 0.7188) + 0.0227
+    (mfc5 + input$monit1 + input$monit2) - (mfc1 + mfc2 + mfc3)
+  })
+
+  output$vent <- renderText({
+    mfc4 <- (input$mfc4.set * 0.869) - 0.0539
+    mfc1 <- (input$mfc1.set * 0.952) + 0.0036
+    mfc2 <- (input$mfc2.set * 0.989) - 0.0421
+    mfc3 <- (input$mfc3.set * 1.0134) - 0.0024
+    mfc5 <- (input$mfc5.set * 0.7188) + 0.0227
+    sample <- (mfc5 + input$monit1 + input$monit2) - (mfc1 + mfc2 + mfc3)
+    mfc4 - sample
+  })
 
 }  # --- end server --- #
 
