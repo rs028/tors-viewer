@@ -4,7 +4,7 @@
 ### --> requires atmosch-R :
 ###       https://github.com/rs028/atmosch-R/
 ###
-### version 0.9.1, June 2024
+### version 0.9.2, June 2024
 ### author: RS
 ### ---------------------------------------------------------------- ###
 
