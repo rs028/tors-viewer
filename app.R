@@ -28,7 +28,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
 
                   ## ------------------ ##
                   ## first panel (main variables)
-                  tabPanel("Main", fluid=TRUE,
+                  tabPanel("Main", fluid=TRUE, br(),
                            sidebarLayout(position="right",
                                          ## main side window
                                          sidebarPanel(width=3,
@@ -57,9 +57,10 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                       hr(style="border-color:black; border-width:3px;"),
                                                       h5("ozone reactivity (s-1):"),
                                                       h6(textOutput("reac1")),
-                                                      h6("equivalent to mixing ratio (ppb):"),
+                                                      h6("equivalent mixing ratio of:"),
                                                       radioButtons(inputId="spec",
                                                                    label="",
+                                                                   inline=TRUE,
                                                                    choices=c("NO",
                                                                              "isoprene",
                                                                              "a-pinene",
@@ -77,7 +78,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
 
                   ## ------------------ ##
                   ## second panel (diagnostic variables)
-                  tabPanel("Diagnostic", fluid=TRUE,
+                  tabPanel("Diagnostic", fluid=TRUE, br(),
                            sidebarLayout(position="right",
                                          ## diagnostic side window
                                          sidebarPanel(width=3,
@@ -105,111 +106,130 @@ ui <- fluidPage(theme=shinytheme("paper"),
 
                   ## ------------------ ##
                   ## third panel (system variables)
-                  tabPanel("System", fluid=TRUE,
-                           fluidRow(br(),
-                                    column(width=6,
+                  tabPanel("System", fluid=TRUE, br(),
+                           column(width=6,
+                                  fluidRow(
+                                    column(width=3,
                                            numericInput(inputId="mfc1.set",
-                                                        label="set O3 lamp",
+                                                        label="O3 lamp",
                                                         min=0,
                                                         max=0.5,
                                                         step=0.01,
                                                         value=0.5
-                                                        ),
-                                           h6(textOutput("mfc1.read")),
+                                                        )),
+                                    column(width=3,
+                                           h6(textOutput("mfc1.read")))
+                                  ),
+                                  fluidRow(
+                                    column(width=3,
                                            numericInput(inputId="mfc2.set",
-                                                        label="set ZA dilution",
+                                                        label="ZA dilution",
                                                         min=0,
                                                         max=2,
                                                         step=0.1,
                                                         value=1.2
-                                                        ),
-                                           h6(textOutput("mfc2.read")),
+                                                        )),
+                                    column(width=3,
+                                           h6(textOutput("mfc2.read")))
+                                  ),
+                                  fluidRow(
+                                    column(width=3,
                                            numericInput(inputId="mfc3.set",
-                                                        label="set OH scrubber",
+                                                        label="OH scrubber",
                                                         min=0,
                                                         max=0.5,
                                                         step=0.01,
                                                         value=0
-                                                        ),
-                                           h6(textOutput("mfc3.read")),
+                                                        )),
+                                    column(width=3,
+                                           h6(textOutput("mfc3.read")))
+                                  ),
+                                  fluidRow(
+                                    column(width=3,
                                            numericInput(inputId="mfc4.set",
-                                                        label="set background",
+                                                        label="background",
                                                         min=0,
                                                         max=5,
                                                         step=0.1,
                                                         value=5
-                                                        ),
-                                           h6(textOutput("mfc4.read")),
+                                                        )),
+                                    column(width=3,
+                                           h6(textOutput("mfc4.read")))
+                                  ),
+                                  fluidRow(
+                                    column(width=3,
                                            numericInput(inputId="mfc5.set",
-                                                        label="set pump",
+                                                        label="pump",
                                                         min=0,
                                                         max=5,
                                                         step=0.1,
                                                         value=1
-                                                        ),
-                                           h6(textOutput("mfc5.read"))
-                                           ),
-                                    column(width=6,
-                                           h5("sample flow (slpm):"),
-                                           h6(textOutput("sample")),
-                                           #h5("residence time (s):"),
-                                           #h6(textOutput("sample")),
-                                           h5("vent flow (slpm):"),
-                                           h6(textOutput("vent"))
-                                           )
-                                    )
+                                                        )),
+                                    column(width=3,
+                                           h6(textOutput("mfc5.read")))
+                                  )),
+                           column(width=6,
+                                  fluidRow(
+                                    h5("reactor (slpm):"),
+                                    h6(textOutput("reactor")),
+                                    h5("vent (slpm):"),
+                                    h6(textOutput("vent")),
+                                    hr(),
+                                    h5("residence time (s):"),
+                                    #h6(textOutput("sample")),
+                                  ))
                            ),
 
                   ## ------------------ ##
                   ## fourth panel (configuration info)
-                  tabPanel("Configuration", fluid=TRUE,
-                           fluidRow(br(),
-                                    column(width=6,
-                                           textInput(inputId="dir4",
-                                                     label="data directory",
-                                                     value="~/TORS/phase4_waseda/"
-                                                     ),
-                                           textInput(inputId="dat4",
-                                                     label="experiment directory",
-                                                     value="raw/"
-                                                     ),
-                                           textInput(inputId="one4",
-                                                     label="box1",
-                                                     value="teraterm1_181201"
-                                                     ),
-                                           textInput(inputId="two4",
-                                                     label="box2",
-                                                     value="teraterm2_181201"
-                                                     )
-                                           ),
-                                    column(width=6,
-                                           numericInput(inputId="time3",
-                                                        label="residence time (s):",
-                                                        step=1,
-                                                        value=128
-                                                        ),
-                                           numericInput(inputId="temp3",
-                                                        label="temperature (C):",
-                                                        step=1,
-                                                        value=25
-                                                        ),
-                                           numericInput(inputId="pres3",
-                                                        label="pressure (mbar):",
-                                                        step=1,
-                                                        value=1013
-                                                        ),
-                                           numericInput(inputId="monit1",
-                                                        label="box 1 flow (slpm):",
-                                                        step=0.1,
-                                                        value=0.9
-                                                        ),
-                                           numericInput(inputId="monit2",
-                                                        label="box 2 flow (slpm):",
-                                                        step=0.1,
-                                                        value=0.9
-                                                        )
-                                           )
+                  tabPanel("Configuration", fluid=TRUE, br(),
+                           fluidRow(
+                             column(width=6,
+                                    textInput(inputId="dir4",
+                                              label="data directory",
+                                              value="~/TORS/phase4_waseda/"
+                                              ),
+                                    textInput(inputId="dat4",
+                                              label="experiment directory",
+                                              value="raw/"
+                                              ),
+                                    textInput(inputId="one4",
+                                              label="box1",
+                                              value="teraterm1_181201"
+                                              ),
+                                    textInput(inputId="two4",
+                                              label="box2",
+                                              value="teraterm2_181201"
+                                              )
+                                    ),
+                             column(width=6,
+                                    numericInput(inputId="time3",
+                                                 label="residence time (s):",
+                                                 step=1,
+                                                 value=128
+                                                 ),
+                                    numericInput(inputId="temp3",
+                                                 label="temperature (C):",
+                                                 step=1,
+                                                 value=25
+                                                 ),
+                                    numericInput(inputId="pres3",
+                                                 label="pressure (mbar):",
+                                                 step=1,
+                                                 value=1013
+                                                 ),
+                                    numericInput(inputId="monit1",
+                                                 label="box 1 inlet (slpm):",
+                                                 step=0.1,
+                                                 value=0.9
+                                                 ),
+                                    numericInput(inputId="monit2",
+                                                 label="box 2 inlet (slpm):",
+                                                 step=0.1,
+                                                 value=0.9
+                                                 )
                                     )
+                           )
                            )
 
                       )  # --- end tabsetPanel --- #
@@ -231,7 +251,8 @@ server <- function(input, output, session) {
     df.box <- merge(box1, box2, by="Datetime", suffixes=c("_1","_2"))
     ## calculate ozone reactivity
     df.box$delta <- df.box$o3_1 - df.box$o3_2
-    df.box$reactivity <- -log(df.box$o3_2 / df.box$o3_1) / input$time3
+    df.box$ratio <- df.box$o3_2 / df.box$o3_1
+    df.box$reactivity <- -log(df.box$ratio) / input$time3
     ## calculate temperature and pressure in standard units
     temp.k <- fConvTemp(input$temp3, "C", "K")
     pres.pa <- fConvPress(input$pres3, "mbar", "Pa")
@@ -273,6 +294,7 @@ server <- function(input, output, session) {
     aa <- ifelse(aa>0, aa, 1)
     spec.mr <- mean(df.data()$species.ppb[aa:az], na.rm=TRUE)
     format(spec.mr, digits=4, scientific=FALSE)
+    paste(spec.mr, "ppb")
   })
 
   ## ------------------ ##
@@ -287,7 +309,8 @@ server <- function(input, output, session) {
     y1 <- df.data()$o3_1
     y2 <- df.data()$o3_2
     y3 <- df.data()$reactivity
-    y4 <- df.data()$delta
+    y4 <- df.data()$ratio
+    y5 <- df.data()$delta
     ## plot main variables
     par(mfrow=c(3,1))
     plot(xt[aa:az], y3[aa:az], type="b", col="darkgreen",
@@ -297,12 +320,16 @@ server <- function(input, output, session) {
     grid(); abline(h=0, lty=2)
     plot(xt[aa:az], y1[aa:az], type="b", col="darkblue",
          ylim=input$range1, cex=1.5, cex.main=2.5, cex.axis=1.5,
-         main=expression("O"[3]~"concentration (ppb)"), xlab="", ylab="")
+         main=expression("O"[3]~"mixing ratio (ppb)"), xlab="", ylab="")
     lines(xt, y2, type="b", col="darkred", cex=2)
     grid(); abline(h=0, lty=2)
     legend("topleft", c("box1","box2"), col=c("darkblue","darkred"),
            lty=1, pch=1, ncol=2, bg="white", inset=0.03 , cex=2.5)
-    plot(xt[aa:az], y4[aa:az], type="b", col="darkorchid",
+    plot(xt[aa:az], y4[aa:az], type="b", col="darkorange",
+         ylim=c(0,1), cex=1.5, cex.main=2.5, cex.axis=1.5,
+         main=expression("box2/box1 (O"[3]*")"), xlab="", ylab="")
+    grid(); abline(h=0, lty=2)
+    plot(xt[aa:az], y5[aa:az], type="b", col="darkorchid",
          ylim=c(-10,10), cex=1.5, cex.main=2.5, cex.axis=1.5,
          main=expression(Delta*"(O"[3]*")"), xlab="", ylab="")
     grid(); abline(h=0, lty=2)
@@ -369,31 +396,26 @@ server <- function(input, output, session) {
   ## ------------------ ##
   ## Flows
   output$mfc1.read <- renderText({
-    mfc1 <- (input$mfc1.set * 0.952) + 0.0036   # O3 lamp
-    paste("read =", mfc1)
+    (input$mfc1.set * 0.952) + 0.0036   # O3 lamp
   })
 
   output$mfc2.read <- renderText({
-    mfc2 <- (input$mfc2.set * 0.989) - 0.0421   # ZA dilution
-    paste("read =", mfc2)
+    (input$mfc2.set * 0.989) - 0.0421   # ZA dilution
   })
 
   output$mfc3.read <- renderText({
-    mfc3 <- (input$mfc3.set * 1.0134) - 0.0024  # OH scrubber
-    paste("read =", mfc3)
+    (input$mfc3.set * 1.0134) - 0.0024  # OH scrubber
   })
 
   output$mfc4.read <- renderText({
-    mfc4 <- (input$mfc4.set * 0.869) - 0.0539   # background
-    paste("read =", mfc4)
+    (input$mfc4.set * 0.869) - 0.0539   # background
   })
 
   output$mfc5.read <- renderText({
-    mfc5 <- (input$mfc5.set * 0.7188) + 0.0227  # pump
-    paste("read =", mfc5)
+    (input$mfc5.set * 0.7188) + 0.0227  # pump
   })
 
-  output$sample <- renderText({
+  output$reactor <- renderText({
     mfc1 <- (input$mfc1.set * 0.952) + 0.0036
     mfc2 <- (input$mfc2.set * 0.989) - 0.0421
     mfc3 <- (input$mfc3.set * 1.0134) - 0.0024
