@@ -37,36 +37,31 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                                    min=1,
                                                                    max=72,
                                                                    step=1,
-                                                                   value=6
-                                                                   ),
+                                                                   value=6),
                                                       textInput(inputId="min1",
                                                                 label="minimum reactivity:",
-                                                                value=0
-                                                                ),
+                                                                value=0),
                                                       textInput(inputId="max1",
                                                                 label="maximum reactivity:",
-                                                                value=1e-3
-                                                                ),
+                                                                value=1e-3),
                                                       sliderInput(inputId="range1",
                                                                   label="ozone range:",
                                                                   min=0,
                                                                   max=300,
                                                                   step=5,
-                                                                  value=c(0,150)
-                                                                  ),
+                                                                  value=c(0,200)),
                                                       hr(style="border-color:black; border-width:3px;"),
                                                       h5("ozone reactivity (s-1):"),
                                                       h6(textOutput("reac1")),
                                                       h6("equivalent mixing ratio of:"),
                                                       radioButtons(inputId="spec",
                                                                    label="",
-                                                                   inline=TRUE,
                                                                    choices=c("NO",
                                                                              "isoprene",
                                                                              "a-pinene",
                                                                              "limonene"),
                                                                    selected="a-pinene",
-                                                                   ),
+                                                                   inline=TRUE),
                                                       h6(textOutput("spec.mr"))
                                                       ),
                                          ## main plot window
@@ -74,7 +69,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                    plotOutput(outputId="mainPlot")
                                                    )
                                          )
-                           ),
+                           ),   # --- end first tabPanel
 
                   ## ------------------ ##
                   ## second panel (diagnostic variables)
@@ -86,23 +81,22 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                                    label="hours displayed:",
                                                                    min=1,
                                                                    max=72,
-                                                                   value=6
-                                                                   ),
+                                                                   value=6),
                                                       radioButtons(inputId="var2",
                                                                    label="diagnostic variables:",
                                                                    choices=c("INTENSITY",
                                                                              "NOISE",
                                                                              "FLOW",
                                                                              "PRESSURE"),
-                                                                   selected="INTENSITY"
-                                                                   )
+                                                                   selected="INTENSITY",
+                                                                   inline=FALSE),
                                                       ),
                                          ## diagnostic plot window
                                          mainPanel(width=9,
                                                    plotOutput(outputId="secondPlot")
                                                    )
                                          )
-                           ),
+                           ),   # --- end second tabPanel
 
                   ## ------------------ ##
                   ## third panel (system variables)
@@ -115,11 +109,9 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                         min=0,
                                                         max=0.5,
                                                         step=0.01,
-                                                        value=0.5
-                                                        )),
+                                                        value=0.5)),
                                     column(width=3,
-                                           h6(textOutput("mfc1.read")))
-                                  ),
+                                           h6(textOutput("mfc1.read")))),
                                   fluidRow(
                                     column(width=3,
                                            numericInput(inputId="mfc2.set",
@@ -127,11 +119,9 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                         min=0,
                                                         max=2,
                                                         step=0.1,
-                                                        value=1.2
-                                                        )),
+                                                        value=1.2)),
                                     column(width=3,
-                                           h6(textOutput("mfc2.read")))
-                                  ),
+                                           h6(textOutput("mfc2.read")))),
                                   fluidRow(
                                     column(width=3,
                                            numericInput(inputId="mfc3.set",
@@ -139,11 +129,9 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                         min=0,
                                                         max=0.5,
                                                         step=0.01,
-                                                        value=0
-                                                        )),
+                                                        value=0)),
                                     column(width=3,
-                                           h6(textOutput("mfc3.read")))
-                                  ),
+                                           h6(textOutput("mfc3.read")))),
                                   fluidRow(
                                     column(width=3,
                                            numericInput(inputId="mfc4.set",
@@ -151,11 +139,9 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                         min=0,
                                                         max=5,
                                                         step=0.1,
-                                                        value=5
-                                                        )),
+                                                        value=5)),
                                     column(width=3,
-                                           h6(textOutput("mfc4.read")))
-                                  ),
+                                           h6(textOutput("mfc4.read")))),
                                   fluidRow(
                                     column(width=3,
                                            numericInput(inputId="mfc5.set",
@@ -163,11 +149,10 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                         min=0,
                                                         max=5,
                                                         step=0.1,
-                                                        value=1
-                                                        )),
+                                                        value=1)),
                                     column(width=3,
-                                           h6(textOutput("mfc5.read")))
-                                  )),
+                                           h6(textOutput("mfc5.read"))))
+                                  ),
                            column(width=6,
                                   fluidRow(
                                     h5("reactor (slpm):"),
@@ -175,10 +160,11 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                     h5("vent (slpm):"),
                                     h6(textOutput("vent")),
                                     hr(),
-                                    h5("residence time (s):"),
+                                    h5("residence time (s):")#,
                                     #h6(textOutput("sample")),
-                                  ))
-                           ),
+                                  )
+                                  )
+                           ),   # --- end third tabPanel
 
                   ## ------------------ ##
                   ## fourth panel (configuration info)
@@ -187,54 +173,43 @@ ui <- fluidPage(theme=shinytheme("paper"),
                              column(width=6,
                                     textInput(inputId="dir4",
                                               label="data directory",
-                                              value="~/TORS/phase4_waseda/"
-                                              ),
+                                              value="~/TORS/phase4_waseda/"),
                                     textInput(inputId="dat4",
                                               label="experiment directory",
-                                              value="raw/"
-                                              ),
+                                              value="raw/"),
                                     textInput(inputId="one4",
                                               label="box1",
-                                              value="teraterm1_181201"
-                                              ),
+                                              value="teraterm1_181201"),
                                     textInput(inputId="two4",
                                               label="box2",
-                                              value="teraterm2_181201"
-                                              )
-                                    ),
+                                              value="teraterm2_181201")),
                              column(width=6,
                                     numericInput(inputId="time3",
                                                  label="residence time (s):",
                                                  step=1,
-                                                 value=128
-                                                 ),
+                                                 value=128),
                                     numericInput(inputId="temp3",
                                                  label="temperature (C):",
                                                  step=1,
-                                                 value=25
-                                                 ),
+                                                 value=25),
                                     numericInput(inputId="pres3",
                                                  label="pressure (mbar):",
                                                  step=1,
-                                                 value=1013
-                                                 ),
+                                                 value=1013),
                                     numericInput(inputId="monit1",
                                                  label="box 1 inlet (slpm):",
                                                  step=0.1,
-                                                 value=0.9
-                                                 ),
+                                                 value=0.9),
                                     numericInput(inputId="monit2",
                                                  label="box 2 inlet (slpm):",
                                                  step=0.1,
-                                                 value=0.9
-                                                 )
+                                                 value=0.9))
                                     )
-                           )
-                           )
+                           )   # --- end fourth tabPanel
 
-                      )  # --- end tabsetPanel --- #
+                )   # --- end tabsetPanel
 
-                )  # --- end fluidPage --- #
+)   # --- end UI section --- #
 
 ## ------------------------------------------------------------------ ##
 ## SERVER section
@@ -433,7 +408,7 @@ server <- function(input, output, session) {
     mfc4 - sample
   })
 
-}  # --- end server --- #
+}   # --- end SERVER section --- #
 
 ## ------------------------------------------------------------------ ##
 ## RUN app
