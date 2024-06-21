@@ -4,14 +4,14 @@
 ### --> requires atmosch-R :
 ###       https://github.com/rs028/atmosch-R/
 ###
-### version 0.9.2, June 2024
+### version 0.9.3, June 2024
 ### author: RS
 ### ---------------------------------------------------------------- ###
 
 require(shiny)
 require(shinythemes)
 
-#options(browser="firefox")
+options(browser="firefox")
 
 ## ------------------------------------------------------------------ ##
 ## UI section
@@ -27,24 +27,24 @@ ui <- fluidPage(theme=shinytheme("paper"),
                 tabsetPanel(
 
                   ## ------------------ ##
-                  ## first panel (main variables)
-                  tabPanel("Main", fluid=TRUE, br(),
+                  ## first panel (data variables)
+                  tabPanel("Data", fluid=TRUE, br(),
                            sidebarLayout(position="right",
-                                         ## main side window
+                                         ## data side window
                                          sidebarPanel(width=3,
-                                                      numericInput(inputId="start1",
+                                                      numericInput(inputId="hours1",
                                                                    label="hours displayed:",
                                                                    min=1,
                                                                    max=72,
                                                                    step=1,
                                                                    value=6),
-                                                      textInput(inputId="min1",
-                                                                label="minimum reactivity:",
+                                                      textInput(inputId="react.min",
+                                                                label="minimum reactivity to display:",
                                                                 value=0),
-                                                      textInput(inputId="max1",
-                                                                label="maximum reactivity:",
+                                                      textInput(inputId="react.max",
+                                                                label="maximum reactivity to display:",
                                                                 value=1e-3),
-                                                      sliderInput(inputId="range1",
+                                                      sliderInput(inputId="o3.range",
                                                                   label="ozone range:",
                                                                   min=0,
                                                                   max=300,
@@ -52,9 +52,9 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                                   value=c(0,200)),
                                                       hr(style="border-color:black; border-width:3px;"),
                                                       h5("ozone reactivity (s-1):"),
-                                                      h6(textOutput("reac1")),
+                                                      h6(textOutput("react.calc")),
                                                       h6("equivalent mixing ratio of:"),
-                                                      radioButtons(inputId="spec",
+                                                      radioButtons(inputId="spec.var",
                                                                    label="",
                                                                    choices=c("NO",
                                                                              "isoprene",
@@ -64,12 +64,12 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                                    inline=TRUE),
                                                       h6(textOutput("spec.mr"))
                                                       ),
-                                         ## main plot window
+                                         ## data plot window
                                          mainPanel(width=9,
-                                                   plotOutput(outputId="mainPlot")
+                                                   plotOutput(outputId="dataPlot")
                                                    )
                                          )
-                           ),   # --- end first tabPanel
+                           ),   # --- end first panel
 
                   ## ------------------ ##
                   ## second panel (diagnostic variables)
@@ -77,12 +77,12 @@ ui <- fluidPage(theme=shinytheme("paper"),
                            sidebarLayout(position="right",
                                          ## diagnostic side window
                                          sidebarPanel(width=3,
-                                                      numericInput(inputId="start2",
+                                                      numericInput(inputId="hours2",
                                                                    label="hours displayed:",
                                                                    min=1,
                                                                    max=72,
                                                                    value=6),
-                                                      radioButtons(inputId="var2",
+                                                      radioButtons(inputId="diagn.var",
                                                                    label="diagnostic variables:",
                                                                    choices=c("INTENSITY",
                                                                              "NOISE",
@@ -93,10 +93,10 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                                       ),
                                          ## diagnostic plot window
                                          mainPanel(width=9,
-                                                   plotOutput(outputId="secondPlot")
+                                                   plotOutput(outputId="diagnostPlot")
                                                    )
                                          )
-                           ),   # --- end second tabPanel
+                           ),   # --- end second panel
 
                   ## ------------------ ##
                   ## third panel (system variables)
@@ -156,56 +156,53 @@ ui <- fluidPage(theme=shinytheme("paper"),
                            column(width=6,
                                   fluidRow(
                                     h5("reactor (slpm):"),
-                                    h6(textOutput("reactor")),
+                                    h6(textOutput("reactor.flow")),
+                                    h5("sample (slpm):"),
+                                    h6(textOutput("sample.flow")),
                                     h5("vent (slpm):"),
-                                    h6(textOutput("vent")),
+                                    h6(textOutput("vent.flow")),
                                     hr(),
-                                    h5("residence time (s):")#,
-                                    #h6(textOutput("sample")),
+                                    h5("residence time (s):"),
+                                    h6(textOutput("tau.sec")))
                                   )
-                                  )
-                           ),   # --- end third tabPanel
+                           ),   # --- end third panel
 
                   ## ------------------ ##
                   ## fourth panel (configuration info)
                   tabPanel("Configuration", fluid=TRUE, br(),
                            fluidRow(
                              column(width=6,
-                                    textInput(inputId="dir4",
-                                              label="data directory",
-                                              value="~/TORS/phase4_waseda/"),
-                                    textInput(inputId="dat4",
-                                              label="experiment directory",
-                                              value="raw/"),
-                                    textInput(inputId="one4",
-                                              label="box1",
+                                    textInput(inputId="data.dir",
+                                              label="data directory:",
+                                              value="~/code/tors-viewer/"),
+                                    textInput(inputId="expt.dir",
+                                              label="experiment directory:",
+                                              value="logfiles/"),
+                                    textInput(inputId="monit1",
+                                              label="box 1 logfile:",
                                               value="teraterm1_181201"),
-                                    textInput(inputId="two4",
-                                              label="box2",
+                                    textInput(inputId="monit2",
+                                              label="box 2 logfile:",
                                               value="teraterm2_181201")),
                              column(width=6,
-                                    numericInput(inputId="time3",
-                                                 label="residence time (s):",
-                                                 step=1,
-                                                 value=128),
-                                    numericInput(inputId="temp3",
+                                    numericInput(inputId="temp.c",
                                                  label="temperature (C):",
                                                  step=1,
                                                  value=25),
-                                    numericInput(inputId="pres3",
+                                    numericInput(inputId="pres.mbar",
                                                  label="pressure (mbar):",
                                                  step=1,
                                                  value=1013),
-                                    numericInput(inputId="monit1",
-                                                 label="box 1 inlet (slpm):",
+                                    numericInput(inputId="inlet1",
+                                                 label="box 1 inlet flow (slpm):",
                                                  step=0.1,
                                                  value=0.9),
-                                    numericInput(inputId="monit2",
-                                                 label="box 2 inlet (slpm):",
+                                    numericInput(inputId="inlet2",
+                                                 label="box 2 inlet flow (slpm):",
                                                  step=0.1,
                                                  value=0.9))
                                     )
-                           )   # --- end fourth tabPanel
+                           )   # --- end fourth panel
 
                 )   # --- end tabsetPanel
 
@@ -216,23 +213,23 @@ ui <- fluidPage(theme=shinytheme("paper"),
 
 server <- function(input, output, session) {
 
-  ## ------------------ ##
-  ##  (1 minute interval)
+  ## ---------------------------------------- ##
+  ##
   df.data <- reactive({
-    invalidateLater(60000, session)
+    invalidateLater(60000, session)  # update every 60 seconds
     ## read data files
-    box1 <- fRead_Thermo(paste(input$dir4, input$dat4, sep=""), input$one4, "49i")
-    box2 <- fRead_Thermo(paste(input$dir4, input$dat4, sep=""), input$two4, "49i")
+    box1 <- fRead_Thermo(paste0(input$data.dir, input$expt.dir), input$monit1, "49i")
+    box2 <- fRead_Thermo(paste0(input$data.dir, input$expt.dir), input$monit2, "49i")
     df.box <- merge(box1, box2, by="Datetime", suffixes=c("_1","_2"))
-    ## calculate ozone reactivity
+    ## ozone reactivity
     df.box$delta <- df.box$o3_1 - df.box$o3_2
     df.box$ratio <- df.box$o3_2 / df.box$o3_1
-    df.box$reactivity <- -log(df.box$ratio) / input$time3
-    ## calculate temperature and pressure in standard units
-    temp.k <- fConvTemp(input$temp3, "C", "K")
-    pres.pa <- fConvPress(input$pres3, "mbar", "Pa")
-    ## calculate rate coefficient of ozonolysis reaction
-    switch(input$spec,
+    df.box$reactivity <- -log(df.box$ratio) / df.flows()$tau
+    ## temperature and pressure in standard units
+    temp.k <- fConvTemp(input$temp.c, "C", "K")
+    pres.pa <- fConvPress(input$pres.mbar, "mbar", "Pa")
+    ## rate coefficients of ozonolysis reactions
+    switch(input$spec.var,
            "NO"={
              rate.coeff <- fKBi(2.07e-12, -1400, temp.k)[[1]]
            },
@@ -245,15 +242,14 @@ server <- function(input, output, session) {
            "limonene"={
              rate.coeff <- fKBi(2.91e-15, -770, temp.k)[[1]]
            })
-    ## calculate equivalent mixing ratio for selected species
+    ## equivalent mixing ratios of selected species
     df.box$species <- df.box$reactivity/rate.coeff
     df.box$species.ppb <- fConcGas(df.box$species, "ND", "ppb", temp.k, pres.pa)
     return(df.box)
   })
 
-  ## ------------------ ##
-  ## calculate average ozone reactivity (5 minutes)
-  output$reac1 <- renderText({
+  ## average ozone reactivity (5 minutes)
+  output$react.calc <- renderText({
     az <- nrow(df.data())
     aa <- az - 5
     aa <- ifelse(aa>0, aa, 1)
@@ -261,24 +257,22 @@ server <- function(input, output, session) {
     format(react.5m, digits=4, scientific=TRUE)
   })
 
-  ## ------------------ ##
-  ## calculate average equivalent mixing ratio (5 minutes)
+  ## average equivalent mixing ratio (5 minutes)
   output$spec.mr <- renderText({
     az <- nrow(df.data())
     aa <- az - 5
     aa <- ifelse(aa>0, aa, 1)
     spec.mr <- mean(df.data()$species.ppb[aa:az], na.rm=TRUE)
-    format(spec.mr, digits=4, scientific=FALSE)
-    paste(spec.mr, "ppb")
+    paste(format(spec.mr, digits=4, scientific=FALSE), "ppb")
   })
 
-  ## ------------------ ##
-  ## primary panel plots (main variables)
-  output$mainPlot <- renderPlot({
+  ## ---------------------------------------- ##
+  ## data plots (first panel)
+  output$dataPlot <- renderPlot({
     ## x-axis
     xt <- df.data()$Datetime
     az <- nrow(df.data())
-    aa <- az - (input$start1 * 60)
+    aa <- az - (input$hours1 * 60)
     aa <- ifelse(aa>0, aa, 1)
     ## y-axis
     y1 <- df.data()$o3_1
@@ -286,40 +280,42 @@ server <- function(input, output, session) {
     y3 <- df.data()$reactivity
     y4 <- df.data()$ratio
     y5 <- df.data()$delta
-    ## plot main variables
-    par(mfrow=c(3,1))
+    ## make plot
+    par(mfrow=c(4,1))
     plot(xt[aa:az], y3[aa:az], type="b", col="darkgreen",
-         ylim=c(as.numeric(input$min1),as.numeric(input$max1)),
+         ylim=c(as.numeric(input$react.min),as.numeric(input$react.max)),
          cex=1.5, cex.main=2.5, cex.axis=1.5,
-         main=expression("O"[3]~"reactivity (s"^-1*")"), xlab="", ylab="")
-    grid(); abline(h=0, lty=2)
+         main=expression("O"[3]~"reactivity"), xlab="", ylab=expression("s"^-1))
+    grid()
     plot(xt[aa:az], y1[aa:az], type="b", col="darkblue",
-         ylim=input$range1, cex=1.5, cex.main=2.5, cex.axis=1.5,
-         main=expression("O"[3]~"mixing ratio (ppb)"), xlab="", ylab="")
+         ylim=input$o3.range, cex=1.5, cex.main=2.5, cex.axis=1.5,
+         main=expression("O"[3]~"mixing ratio"), xlab="", ylab=expression("ppb"))
     lines(xt, y2, type="b", col="darkred", cex=2)
-    grid(); abline(h=0, lty=2)
+    grid()
     legend("topleft", c("box1","box2"), col=c("darkblue","darkred"),
            lty=1, pch=1, ncol=2, bg="white", inset=0.03 , cex=2.5)
     plot(xt[aa:az], y4[aa:az], type="b", col="darkorange",
-         ylim=c(0,1), cex=1.5, cex.main=2.5, cex.axis=1.5,
-         main=expression("box2/box1 (O"[3]*")"), xlab="", ylab="")
-    grid(); abline(h=0, lty=2)
+         ylim=c(0.2,1.2), cex=1.5, cex.main=2.5, cex.axis=1.5,
+         main=expression("O"[3]~"ratio"), xlab="", ylab=expression("box2/box1"))
+    abline(h=c(0,1), lty=2)
+    grid()
     plot(xt[aa:az], y5[aa:az], type="b", col="darkorchid",
          ylim=c(-10,10), cex=1.5, cex.main=2.5, cex.axis=1.5,
-         main=expression(Delta*"(O"[3]*")"), xlab="", ylab="")
-    grid(); abline(h=0, lty=2)
-  }, height=800, width=900)
+         main=expression(Delta*"(O"[3]*")"), xlab="", ylab=expression("ppb"))
+    abline(h=0, lty=2)
+    grid()
+  }, height=1200, width=900)
 
-  ## ------------------ ##
-  ## secondary panel plots (diagnostic variables)
-  output$secondPlot <- renderPlot({
+  ## ---------------------------------------- ##
+  ## diagnostic plots (second panel)
+  output$diagnostPlot <- renderPlot({
     ## x-axis
     xt <- df.data()$Datetime
     az <- nrow(df.data())
-    aa <- az - (input$start2 * 60)
+    aa <- az - (input$hours2 * 60)
     aa <- ifelse(aa>0, aa, 1)
     ## y-axis
-    switch(input$var2,
+    switch(input$diagn.var,
            "INTENSITY"={
              y1a <- df.data()$cellai_1
              y1b <- df.data()$cellbi_1
@@ -352,7 +348,7 @@ server <- function(input, output, session) {
              str.a <- "PRESSURE"
              str.b <- ""
            })
-    ## plot diagnostic variables
+    ## make plot
     par(mfrow=c(2,2))
     plot(xt[aa:az], y1a[aa:az], type="b", col="darkblue",
          main=str.a, xlab="", ylab="BOX 1")
@@ -366,46 +362,62 @@ server <- function(input, output, session) {
     plot(xt[aa:az], y2b[aa:az], type="b", col="darkred",
          main=str.b, xlab="", ylab="BOX 2")
     grid()
-  }, height=800, width=900)
+  }, height=900, width=900)
 
-  ## ------------------ ##
+  ## ---------------------------------------- ##
   ## Flows
+
+  df.flows <- reactive({
+    ## mass flow controller calibration
+    mfc1 <- (input$mfc1.set * 0.952) + 0.0036   # O3 lamp
+    mfc2 <- (input$mfc2.set * 0.989) - 0.0421   # ZA dilution
+    mfc3 <- (input$mfc3.set * 1.0134) - 0.0024  # OH scrubber
+    mfc4 <- (input$mfc4.set * 0.869) - 0.0539   # background
+    mfc5 <- (input$mfc5.set * 0.7188) + 0.0227  # pump
+    ## reactor, sample. vent flows
+    reactor <- (mfc5 + input$inlet1 + input$inlet2) - (mfc1 + mfc2 + mfc3)
+    sample <- input$inlet2 + mfc5
+    vent <- mfc4 - reactor
+    ## residence time with reactor volume = 5990 cm3
+    tau <- (5.99 / reactor) * 60
+    df.flows <- data.frame(mfc1, mfc2, mfc3, mfc4, mfc5, reactor, sample, vent, tau)
+    return(df.flows)
+  })
+
   output$mfc1.read <- renderText({
-    (input$mfc1.set * 0.952) + 0.0036   # O3 lamp
+    df.flows()$mfc1
   })
 
   output$mfc2.read <- renderText({
-    (input$mfc2.set * 0.989) - 0.0421   # ZA dilution
+    df.flows()$mfc2
   })
 
   output$mfc3.read <- renderText({
-    (input$mfc3.set * 1.0134) - 0.0024  # OH scrubber
+    df.flows()$mfc3
   })
 
   output$mfc4.read <- renderText({
-    (input$mfc4.set * 0.869) - 0.0539   # background
+    df.flows()$mfc4
   })
 
   output$mfc5.read <- renderText({
-    (input$mfc5.set * 0.7188) + 0.0227  # pump
+    df.flows()$mfc5
   })
 
-  output$reactor <- renderText({
-    mfc1 <- (input$mfc1.set * 0.952) + 0.0036
-    mfc2 <- (input$mfc2.set * 0.989) - 0.0421
-    mfc3 <- (input$mfc3.set * 1.0134) - 0.0024
-    mfc5 <- (input$mfc5.set * 0.7188) + 0.0227
-    (mfc5 + input$monit1 + input$monit2) - (mfc1 + mfc2 + mfc3)
+  output$reactor.flow <- renderText({
+    df.flows()$reactor
   })
 
-  output$vent <- renderText({
-    mfc4 <- (input$mfc4.set * 0.869) - 0.0539
-    mfc1 <- (input$mfc1.set * 0.952) + 0.0036
-    mfc2 <- (input$mfc2.set * 0.989) - 0.0421
-    mfc3 <- (input$mfc3.set * 1.0134) - 0.0024
-    mfc5 <- (input$mfc5.set * 0.7188) + 0.0227
-    sample <- (mfc5 + input$monit1 + input$monit2) - (mfc1 + mfc2 + mfc3)
-    mfc4 - sample
+  output$sample.flow <- renderText({
+    df.flows()$sample
+  })
+
+  output$vent.flow <- renderText({
+    df.flows()$vent
+  })
+
+  output$tau.sec <- renderText({
+    df.flows()$tau
   })
 
 }   # --- end SERVER section --- #
