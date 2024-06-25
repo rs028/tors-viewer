@@ -1,20 +1,19 @@
 ### ---------------------------------------------------------------- ###
 ### TORS viewer
 ###
-### --> requires atmosch-R :
-###       https://github.com/rs028/atmosch-R/
+### An interactive interface for the Total Ozone Reactivity System
+### (TORS) instrument
 ###
-### --> to run, execute :
-##        runApp("app.R")
+### --> to run the application, execute the command: runApp("app.R")
 ###
 ### version 0.9.3, June 2024
 ### author: RS
 ### ---------------------------------------------------------------- ###
 
-require(shiny)
-require(shinythemes)
+library(shiny)
+library(shinythemes)
 
-options(browser="firefox")
+#options(browser="firefox")
 
 ## ------------------------------------------------------------------ ##
 ## UI section
@@ -257,7 +256,7 @@ server <- function(input, output, session) {
            })
     ## equivalent mixing ratios of selected species
     df.box$species <- df.box$reactivity/rate.coeff
-    df.box$species.ppb <- df.box$species/2.5e10 #fConcGas(df.box$species, "ND", "ppb", temp.k, pres.pa)
+    df.box$species.ppb <- fConcGas(df.box$species, "ND", "ppb", temp.k, pres.pa)
     return(df.box)
   })
 
