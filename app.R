@@ -14,6 +14,8 @@
 library(shiny)
 library(shinythemes)
 
+source("appFuncs.R")
+
 #options(browser="firefox")
 
 ## ------------------------------------------------------------------ ##
@@ -68,7 +70,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
                                  "b-caryophyllene"),
                        selected="a-pinene",
                        inline=TRUE),
-          h6(textOutput("spec.mr"))
+          h6(textOutput("species.mr"))
         ),
         ## data plot window
         mainPanel(width=9,
@@ -270,24 +272,16 @@ server <- function(input, output, session) {
 
   ## average ozone reactivity (5 minutes)
   output$react.calc <- renderText({
-    az <- nrow(df.data())
-    aa <- az - 5
-    aa <- ifelse(aa > 0, aa, 1)
-    react.5m <- mean(df.data()$reactivity[aa:az], na.rm=TRUE)
-    format(react.5m, digits=4, scientific=TRUE)
+    displayAVG(df.data()$reactivity, 5)
   })
 
   ## average equivalent mixing ratio (5 minutes)
-  output$spec.mr <- renderText({
-    az <- nrow(df.data())
-    aa <- az - 5
-    aa <- ifelse(aa > 0, aa, 1)
-    spec.mr <- mean(df.data()$species.ppb[aa:az], na.rm=TRUE)
-    paste(format(spec.mr, digits=4, scientific=FALSE), "ppb")
+  output$species.mr <- renderText({
+    displayAVG(df.data()$species.ppb, 5)
   })
 
   ## ---------------------------------------- ##
-  ## data plots (first panel)
+  ## data plots [first panel]
   output$dataPlot <- renderPlot({
     ## x-axis
     xt <- df.data()$Datetime
@@ -328,7 +322,7 @@ server <- function(input, output, session) {
   height=1200, width=900)
 
   ## ---------------------------------------- ##
-  ## diagnostic plots (second panel)
+  ## diagnostic plots [second panel]
   output$diagnostPlot <- renderPlot({
     ## x-axis
     xt <- df.data()$Datetime
@@ -387,7 +381,7 @@ server <- function(input, output, session) {
   height=900, width=900)
 
   ## ---------------------------------------- ##
-  ## instrument flows and residence time
+  ## instrument flows and residence time [third panel]
   df.flows <- reactive({
     ## mass flow controller calibration
     mfc1 <- (input$mfc1.set * 0.952) + 0.0036   # O3 lamp
@@ -407,56 +401,47 @@ server <- function(input, output, session) {
 
   ## O3 lamp flow
   output$mfc1.read <- renderText({
-    mfc1.read <- ifelse(df.flows()$mfc1 < 0, 0, df.flows()$mfc1)
-    format(mfc1.read, digits=3, scientific=FALSE)
+    readOUT(df.flows()$mfc1)
   })
 
   ## ZA dilution flow
   output$mfc2.read <- renderText({
-    mfc2.read <- ifelse(df.flows()$mfc2 < 0, 0, df.flows()$mfc2)
-    format(mfc2.read, digits=3, scientific=FALSE)
+  readOUT(df.flows()$mfc2)
   })
 
   ## OH scrubber flow
   output$mfc3.read <- renderText({
-    mfc3.read <- ifelse(df.flows()$mfc3 < 0, 0, df.flows()$mfc3)
-    format(mfc3.read, digits=3, scientific=FALSE)
+  readOUT(df.flows()$mfc3)
   })
 
   ## background flow
   output$mfc4.read <- renderText({
-    mfc4.read <- ifelse(df.flows()$mfc4 < 0, 0, df.flows()$mfc4)
-    format(mfc4.read, digits=3, scientific=FALSE)
+  readOUT(df.flows()$mfc4)
   })
 
   ## pump flow
   output$mfc5.read <- renderText({
-    mfc5.read <- ifelse(df.flows()$mfc5 < 0, 0, df.flows()$mfc5)
-    format(mfc5.read, digits=3, scientific=FALSE)
+    readOUT(df.flows()$mfc5)
   })
 
   ## reactor flow
   output$reactor.flow <- renderText({
-    reactor.flow <- ifelse(df.flows()$reactor < 0, 0, df.flows()$reactor)
-    format(reactor.flow, digits=3, scientific=FALSE)
+    readOUT(df.flows()$reactor)
   })
 
   ## sample (inlet) flow
   output$sample.flow <- renderText({
-    sample.flow <- ifelse(df.flows()$sample < 0, 0, df.flows()$sample)
-    format(sample.flow, digits=3, scientific=FALSE)
+    readOUT(df.flows()$sample)
   })
 
   ## vent (exhaust) flow
   output$vent.flow <- renderText({
-    vent.flow <- ifelse(df.flows()$vent < 0, 0, df.flows()$vent)
-    format(vent.flow, digits=3, scientific=FALSE)
+    readOUT(df.flows()$vent)
   })
 
   ## residence time
   output$tau.sec <- renderText({
-    tau.sec <- ifelse(df.flows()$tau < 0, 0, df.flows()$tau)
-    format(tau.sec, digits=3, scientific=FALSE)
+    readOUT(df.flows()$tau)
   })
 
 }   # --- end SERVER section --- #
