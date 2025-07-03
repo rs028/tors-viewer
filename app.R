@@ -1,10 +1,11 @@
 ### ---------------------------------------------------------------- ###
 ### TORS viewer
 ###
-### An interactive interface for the Total Ozone Reactivity System
+### An interactive interface for the UoB Total Ozone Reactivity System
 ### (TORS) instrument
 ###
-### --> to run the application, execute the command: runApp("app.R")
+### ==> to run the application, launch R and execute the command:
+###       runApp("app.R")
 ###
 ### version 0.9.3, June 2024
 ### author: RS
@@ -20,197 +21,204 @@ library(shinythemes)
 
 ui <- fluidPage(theme=shinytheme("paper"),
 
-                ## ------------------------------------------ ##
-                ## title
-                titlePanel("TORS viewer [v0.9.3]"),
-                           hr(style="border-color:black; border-width:2px;"),
+  ## ------------------------------------------ ##
+  ## title
+  titlePanel("TORS viewer [v0.9.3]"),
+  hr(style="border-color:black; border-width:2px;"),
 
-                ## ------------------------------------------ ##
-                ## tabset layout
-                tabsetPanel(
+  ## ------------------------------------------ ##
+  ## tabset layout
+  tabsetPanel(
 
-                  ## ------------------ ##
-                  ## first panel (data variables)
-                  tabPanel("Data", fluid=TRUE, br(),
-                           sidebarLayout(position="right",
-                                         ## data side window
-                                         sidebarPanel(width=3,
-                                                      numericInput(inputId="data.hrs",
-                                                                   label="hours to display:",
-                                                                   min=1,
-                                                                   max=72,
-                                                                   step=1,
-                                                                   value=6),
-                                                      textInput(inputId="react.min",
-                                                                label="minimum reactivity to display:",
-                                                                value=0),
-                                                      textInput(inputId="react.max",
-                                                                label="maximum reactivity to display:",
-                                                                value=1e-3),
-                                                      sliderInput(inputId="o3.range",
-                                                                  label="ozone range:",
-                                                                  min=0,
-                                                                  max=300,
-                                                                  step=5,
-                                                                  value=c(0,200)),
-                                                      hr(style="border-color:black; border-width:2px;"),
-                                                      h5("ozone reactivity (s-1):"),
-                                                      h6(textOutput("react.calc")),
-                                                      h6("equivalent mixing ratio of:"),
-                                                      radioButtons(inputId="spec.var",
-                                                                   label="",
-                                                                   choices=c("NO",
-                                                                             "isoprene",
-                                                                             "a-pinene",
-                                                                             "b-pinene",
-                                                                             "limonene",
-                                                                             "b-caryophyllene"),
-                                                                   selected="a-pinene",
-                                                                   inline=TRUE),
-                                                      h6(textOutput("spec.mr"))
-                                                      ),
-                                         ## data plot window
-                                         mainPanel(width=9,
-                                                   plotOutput(outputId="dataPlot")
-                                                   )
-                                         )
-                           ),   # --- end first panel
+    ## ------------------ ##
+    ## first panel [data variables]
+    tabPanel("Data", fluid=TRUE, br(),
+      sidebarLayout(position="right",
+        ## data side window
+        sidebarPanel(width=3,
+          numericInput(inputId="data.hrs",
+                       label="hours to display:",
+                       min=1,
+                       max=72,
+                       step=1,
+                       value=6),
+          textInput(inputId="react.min",
+                    label="minimum reactivity to display:",
+                    value=0),
+          textInput(inputId="react.max",
+                    label="maximum reactivity to display:",
+                    value=1e-3),
+          sliderInput(inputId="o3.range",
+                      label="ozone range:",
+                      min=0,
+                      max=300,
+                      step=5,
+                      value=c(0,200)),
+          hr(style="border-color:black; border-width:2px;"),
+          h5("ozone reactivity (s-1):"),
+          h6(textOutput("react.calc")),
+          h6("equivalent mixing ratio of:"),
+          radioButtons(inputId="spec.var",
+                       label="",
+                       choices=c("NO",
+                                 "isoprene",
+                                 "a-pinene",
+                                 "b-pinene",
+                                 "limonene",
+                                 "b-caryophyllene"),
+                       selected="a-pinene",
+                       inline=TRUE),
+          h6(textOutput("spec.mr"))
+        ),
+        ## data plot window
+        mainPanel(width=9,
+          plotOutput(outputId="dataPlot")
+        )
+      )
+    ),  # --- end first panel
 
-                  ## ------------------ ##
-                  ## second panel (diagnostic variables)
-                  tabPanel("Diagnostic", fluid=TRUE, br(),
-                           sidebarLayout(position="right",
-                                         ## diagnostic side window
-                                         sidebarPanel(width=3,
-                                                      numericInput(inputId="diagn.hrs",
-                                                                   label="hours to display:",
-                                                                   min=1,
-                                                                   max=72,
-                                                                   value=6),
-                                                      radioButtons(inputId="diagn.var",
-                                                                   label="diagnostic variables:",
-                                                                   choices=c("INTENSITY",
-                                                                             "NOISE",
-                                                                             "FLOW",
-                                                                             "PRESSURE"),
-                                                                   selected="INTENSITY",
-                                                                   inline=FALSE),
-                                                      ),
-                                         ## diagnostic plot window
-                                         mainPanel(width=9,
-                                                   plotOutput(outputId="diagnostPlot")
-                                                   )
-                                         )
-                           ),   # --- end second panel
+    ## ------------------ ##
+    ## second panel [diagnostic variables]
+    tabPanel("Diagnostic", fluid=TRUE, br(),
+      sidebarLayout(position="right",
+        ## diagnostic side window
+        sidebarPanel(width=3,
+          numericInput(inputId="diagn.hrs",
+                       label="hours to display:",
+                       min=1,
+                       max=72,
+                       value=6),
+          radioButtons(inputId="diagn.var",
+                       label="diagnostic variables:",
+                       choices=c("INTENSITY",
+                                 "NOISE",
+                                 "FLOW",
+                                 "PRESSURE"),
+                       selected="INTENSITY",
+                       inline=FALSE),
+        ),
+        ## diagnostic plot window
+        mainPanel(width=9,
+          plotOutput(outputId="diagnostPlot")
+        )
+      )
+    ),  # --- end second panel
 
-                  ## ------------------ ##
-                  ## third panel (system variables)
-                  tabPanel("System", fluid=TRUE, br(),
-                           h5("mass flow controllers (slpm):"),
-                           column(width=6,
-                                  fluidRow(
-                                    column(width=3,
-                                           numericInput(inputId="mfc1.set",
-                                                        label="O3 lamp",
-                                                        min=0,
-                                                        max=0.5,
-                                                        step=0.01,
-                                                        value=0.5)),
-                                    column(width=3,
-                                           h6(textOutput("mfc1.read")))),
-                                  fluidRow(
-                                    column(width=3,
-                                           numericInput(inputId="mfc2.set",
-                                                        label="ZA dilution",
-                                                        min=0,
-                                                        max=2,
-                                                        step=0.01,
-                                                        value=1.2)),
-                                    column(width=3,
-                                           h6(textOutput("mfc2.read")))),
-                                  fluidRow(
-                                    column(width=3,
-                                           numericInput(inputId="mfc3.set",
-                                                        label="OH scrubber",
-                                                        min=0,
-                                                        max=0.5,
-                                                        step=0.01,
-                                                        value=0)),
-                                    column(width=3,
-                                           h6(textOutput("mfc3.read")))),
-                                  fluidRow(
-                                    column(width=3,
-                                           numericInput(inputId="mfc4.set",
-                                                        label="background",
-                                                        min=0,
-                                                        max=5,
-                                                        step=0.01,
-                                                        value=5)),
-                                    column(width=3,
-                                           h6(textOutput("mfc4.read")))),
-                                  fluidRow(
-                                    column(width=3,
-                                           numericInput(inputId="mfc5.set",
-                                                        label="pump",
-                                                        min=0,
-                                                        max=5,
-                                                        step=0.01,
-                                                        value=1)),
-                                    column(width=3,
-                                           h6(textOutput("mfc5.read"))))
-                                  ),
-                           column(width=6,
-                                  fluidRow(
-                                    h5("reactor (slpm):"),
-                                    h6(textOutput("reactor.flow")),
-                                    h5("sample (slpm):"),
-                                    h6(textOutput("sample.flow")),
-                                    h5("vent (slpm):"),
-                                    h6(textOutput("vent.flow")),
-                                    hr(),
-                                    h5("residence time (s):"),
-                                    h6(textOutput("tau.sec")))
-                                  )
-                           ),   # --- end third panel
+    ## ------------------ ##
+    ## third panel [system variables]
+    tabPanel("System", fluid=TRUE, br(),
+      h5("mass flow controllers (slpm):"),
+      ## column one [mass flow controllers]
+      column(width=6,
+        fluidRow(
+          column(width=3,
+            numericInput(inputId="mfc1.set",
+                         label="O3 lamp",
+                         min=0,
+                         max=0.5,
+                         step=0.01,
+                         value=0.5)),
+          column(width=3,
+            h6(textOutput("mfc1.read")))
+        ),
+        fluidRow(
+          column(width=3,
+            numericInput(inputId="mfc2.set",
+                         label="ZA dilution",
+                         min=0,
+                         max=2,
+                         step=0.01,
+                         value=1.2)),
+          column(width=3,
+            h6(textOutput("mfc2.read")))
+        ),
+      fluidRow(
+        column(width=3,
+          numericInput(inputId="mfc3.set",
+                       label="OH scrubber",
+                       min=0,
+                       max=0.5,
+                       step=0.01,
+                       value=0)),
+        column(width=3,
+          h6(textOutput("mfc3.read")))
+      ),
+      fluidRow(
+        column(width=3,
+          numericInput(inputId="mfc4.set",
+                       label="background",
+                       min=0,
+                       max=5,
+                       step=0.01,
+                       value=5)),
+        column(width=3,
+          h6(textOutput("mfc4.read")))
+      ),
+      fluidRow(
+        column(width=3,
+          numericInput(inputId="mfc5.set",
+                       label="pump",
+                       min=0,
+                       max=5,
+                       step=0.01,
+                       value=1)),
+        column(width=3,
+          h6(textOutput("mfc5.read")))
+      )
+    ),
+    ## column two [instrument flows]
+    column(width=6,
+      fluidRow(
+        h5("reactor (slpm):"),
+        h6(textOutput("reactor.flow")),
+        h5("sample (slpm):"),
+        h6(textOutput("sample.flow")),
+        h5("vent (slpm):"),
+        h6(textOutput("vent.flow")),
+        hr(),
+        h5("residence time (s):"),
+        h6(textOutput("tau.sec")))
+      )
+    ),  # --- end third panel
 
-                  ## ------------------ ##
-                  ## fourth panel (configuration info)
-                  tabPanel("Configuration", fluid=TRUE, br(),
-                           fluidRow(
-                             column(width=6,
-                                    textInput(inputId="data.dir",
-                                              label="data directory:",
-                                              value="~/code/tors-viewer/"),
-                                    textInput(inputId="expt.dir",
-                                              label="experiment directory:",
-                                              value="logfiles/"),
-                                    textInput(inputId="monit1",
-                                              label="BOX1 logfile:",
-                                              value="teraterm1_181201"),
-                                    textInput(inputId="monit2",
-                                              label="BOX2 logfile:",
-                                              value="teraterm2_181201")),
-                             column(width=6,
-                                    numericInput(inputId="temp.c",
-                                                 label="reactor temperature (C):",
-                                                 step=1,
-                                                 value=25),
-                                    numericInput(inputId="pres.mbar",
-                                                 label="reactor pressure (mbar):",
-                                                 step=1,
-                                                 value=1013),
-                                    numericInput(inputId="inlet1",
-                                                 label="BOX1 inlet flow (slpm):",
-                                                 step=0.1,
-                                                 value=0.9),
-                                    numericInput(inputId="inlet2",
-                                                 label="BOX2 inlet flow (slpm):",
-                                                 step=0.1,
-                                                 value=0.9))
-                                    )
-                           )   # --- end fourth panel
+    ## ------------------ ##
+    ## fourth panel [configuration info]
+    tabPanel("Configuration", fluid=TRUE, br(),
+      fluidRow(
+        column(width=6,
+          textInput(inputId="data.dir",
+                    label="data directory:",
+                    value="~/code/tors-viewer/"),
+          textInput(inputId="expt.dir",
+                    label="experiment directory:",
+                    value="logfiles/"),
+          textInput(inputId="monit1",
+                    label="BOX1 logfile:",
+                    value="teraterm1_181201"),
+          textInput(inputId="monit2",
+                    label="BOX2 logfile:",
+                    value="teraterm2_181201")),
+        column(width=6,
+          numericInput(inputId="temp.c",
+                       label="reactor temperature (C):",
+                       step=1,
+                       value=25),
+          numericInput(inputId="pres.mbar",
+                       label="reactor pressure (mbar):",
+                       step=1,
+                       value=1013),
+          numericInput(inputId="inlet1",
+                       label="BOX1 inlet flow (slpm):",
+                       step=0.1,
+                       value=0.9),
+          numericInput(inputId="inlet2",
+                       label="BOX2 inlet flow (slpm):",
+                       step=0.1,
+                       value=0.9))
+      )
+    )   # --- end fourth panel
 
-                )   # --- end tabsetPanel
+  )   # --- end tabsetPanel
 
 )   # --- end UI section --- #
 
@@ -316,7 +324,8 @@ server <- function(input, output, session) {
          main=expression(Delta*"(O"[3]*")"), xlab="", ylab=expression("BOX1-BOX2 (ppb)"))
     abline(h=0, lty=2)
     grid()
-  }, height=1200, width=900)
+  },
+  height=1200, width=900)
 
   ## ---------------------------------------- ##
   ## diagnostic plots (second panel)
@@ -374,7 +383,8 @@ server <- function(input, output, session) {
     plot(xt[aa:az], y2b[aa:az], type="b", col="darkred",
          main=str.b, xlab="", ylab="BOX 2")
     grid()
-  }, height=900, width=900)
+  },
+  height=900, width=900)
 
   ## ---------------------------------------- ##
   ## instrument flows and residence time

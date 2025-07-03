@@ -4,15 +4,17 @@ tors-viewer
 tors-viewer is an interactive interface for the Total Ozone Reactivity
 System (TORS) instrument.
 
+
 Requirements
 ------------
 
-A base installation of [R](http://www.r-project.org/), with the
+A base installation of [R](https://www.r-project.org/), with the
 packages [shiny](https://cran.r-project.org/web/packages/shiny/) and
 [shinythemes](https://cran.r-project.org/web/packages/shinythemes/).
 
 In addition, tors-viewer requires the
 [atmosch-R](https://github.com/rs028/atmosch-R/) functions.
+
 
 Execution
 ---------
