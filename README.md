@@ -1,27 +1,25 @@
-tors-viewer
+tors-viewer ![license](https://img.shields.io/github/license/rs028/tors-viewer)
 ===========
 
-tors-viewer is an interactive interface for the Total Ozone Reactivity
-System (TORS) instrument.
+**tors-viewer** is an interactive interface for the UoB Total Ozone Reactivity System (TORS) instrument. For a detailed description of the TORS instrument see:
+
+Sommariva et al., *Atmos. Meas. Tech.*, 13, 1655-1670, https://doi.org/10.5194/amt-13-1655-2020, 2020.
 
 
 Requirements
 ------------
 
-A base installation of [R](https://www.r-project.org/), with the
-packages [shiny](https://cran.r-project.org/web/packages/shiny/) and
-[shinythemes](https://cran.r-project.org/web/packages/shinythemes/).
+A base installation of [R](https://www.r-project.org), with the packages [shiny](https://cran.r-project.org/web/packages/shiny) and [shinythemes](https://cran.r-project.org/web/packages/shinythemes).
 
-In addition, tors-viewer requires the
-[atmosch-R](https://github.com/rs028/atmosch-R/) functions.
+In addition, tors-viewer requires the [atmosch-R](https://github.com/rs028/atmosch-R) functions. See the related [README file](https://github.com/rs028/atmosch-R/blob/master/README.md) for instructions on how to download and install atmosch-R.
 
 
-Execution
----------
+Installation & Execution
+------------------------
 
-Launch R and move to the tors-viewer directory, then type
-`runApp("app.R")` at the command prompt. This will open the viewer in
-the default browser.
+Click on the `<> Code` button to download the ZIP archive. Then, unzip it in a directory of choice. There are two ways to execute the tors-viewer:
 
-Alternatively, open the `app.R` file in RStudio and click the **Run App**
-button on the toolbar.
+1. Launch R, and set the R working directory to the tors-viewer directory. Type `runApp("app.R")` at the command prompt. This will open tors-viewer in the default browser.  
+**Note:** it may be necesary to execute `library(shiny)`, before `runApp().
+
+2. Open the `app.R` file in RStudio and click the **Run App** button on the toolbar. This will open tors-viewer in the Rstudio viewer pane.

@@ -1,14 +1,12 @@
 ### ---------------------------------------------------------------- ###
 ### TORS viewer
 ###
-### An interactive interface for the UoB Total Ozone Reactivity System
+### Interactive interface for the UoB Total Ozone Reactivity System
 ### (TORS) instrument
 ###
-### ==> to run the application, launch R and execute the command:
-###       runApp("app.R")
-###
-### version 0.9.3, June 2024
+### version 0.9.4, July 2025
 ### author: RS
+### credits: LD
 ### ---------------------------------------------------------------- ###
 
 library(shiny)
@@ -25,7 +23,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
 
   ## ------------------------------------------ ##
   ## title
-  titlePanel("TORS viewer [v0.9.3]"),
+  titlePanel("TORS viewer [v0.9.4]"),
   hr(style="border-color:black; border-width:2px;"),
 
   ## ------------------------------------------ ##
@@ -33,7 +31,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
   tabsetPanel(
 
     ## ------------------ ##
-    ## first panel [data variables]
+    ## first panel (data variables)
     tabPanel("Data", fluid=TRUE, br(),
       sidebarLayout(position="right",
         ## data side window
@@ -80,7 +78,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
     ),  # --- end first panel
 
     ## ------------------ ##
-    ## second panel [diagnostic variables]
+    ## second panel (diagnostic variables)
     tabPanel("Diagnostic", fluid=TRUE, br(),
       sidebarLayout(position="right",
         ## diagnostic side window
@@ -107,10 +105,10 @@ ui <- fluidPage(theme=shinytheme("paper"),
     ),  # --- end second panel
 
     ## ------------------ ##
-    ## third panel [system variables]
+    ## third panel (system variables)
     tabPanel("System", fluid=TRUE, br(),
       h5("mass flow controllers (slpm):"),
-      ## column one [mass flow controllers]
+      ## column one (mass flow controllers)
       column(width=6,
         fluidRow(
           column(width=3,
@@ -168,7 +166,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
           h6(textOutput("mfc5.read")))
       )
     ),
-    ## column two [instrument flows]
+    ## column two (instrument flows & residence time)
     column(width=6,
       fluidRow(
         h5("reactor (slpm):"),
@@ -184,7 +182,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
     ),  # --- end third panel
 
     ## ------------------ ##
-    ## fourth panel [configuration info]
+    ## fourth panel (configuration info)
     tabPanel("Configuration", fluid=TRUE, br(),
       fluidRow(
         column(width=6,
@@ -233,7 +231,7 @@ server <- function(input, output, session) {
   ## ozone measurements and reactivity
   df.data <- reactive({
     invalidateLater(60000, session)  # update every 60 seconds
-    ## read data files -->> Thermo 491 monitors, logging via teraterm
+    ## read data files ==>> Thermo 491 monitors, logging via teraterm
     box1 <- fRead_Thermo(paste0(input$data.dir, input$expt.dir), input$monit1, "49i")
     box2 <- fRead_Thermo(paste0(input$data.dir, input$expt.dir), input$monit2, "49i")
     df.box <- merge(box1, box2, by="Datetime", suffixes=c("_1","_2"))
@@ -265,7 +263,7 @@ server <- function(input, output, session) {
              rate.coeff <- 1.2e-14
            })
     ## equivalent mixing ratios of selected species
-    df.box$species <- df.box$reactivity/rate.coeff
+    df.box$species <- df.box$reactivity / rate.coeff
     df.box$species.ppb <- fConcGas(df.box$species, "ND", "ppb", temp.k, pres.pa)
     return(df.box)
   })
@@ -281,20 +279,19 @@ server <- function(input, output, session) {
   })
 
   ## ---------------------------------------- ##
-  ## data plots [first panel]
+  ## data plots (first panel)
   output$dataPlot <- renderPlot({
     ## x-axis
     xt <- df.data()$Datetime
     az <- nrow(df.data())
-    aa <- az - (input$data.hrs * 60)
-    aa <- ifelse(aa>0, aa, 1)
+    aa <- max(az - (input$data.hrs * 60))
     ## y-axis
     y1 <- df.data()$o3_1
     y2 <- df.data()$o3_2
     y3 <- df.data()$reactivity
     y4 <- df.data()$ratio
     y5 <- df.data()$delta
-    ## make plot
+    ## make data plot
     par(mfrow=c(4,1))
     plot(xt[aa:az], y3[aa:az], type="b", col="darkgreen",
          ylim=c(as.numeric(input$react.min),as.numeric(input$react.max)),
@@ -315,20 +312,19 @@ server <- function(input, output, session) {
     grid()
     plot(xt[aa:az], y5[aa:az], type="b", col="darkorchid",
          ylim=c(-10,10), cex=1.5, cex.main=2.5, cex.axis=1.5,
-         main=expression(Delta*"(O"[3]*")"), xlab="", ylab=expression("BOX1-BOX2 (ppb)"))
+         main=expression(Delta~"(O"[3]*")"), xlab="", ylab=expression("BOX1-BOX2 (ppb)"))
     abline(h=0, lty=2)
     grid()
   },
   height=1200, width=900)
 
   ## ---------------------------------------- ##
-  ## diagnostic plots [second panel]
+  ## diagnostic plots (second panel)
   output$diagnostPlot <- renderPlot({
     ## x-axis
     xt <- df.data()$Datetime
     az <- nrow(df.data())
-    aa <- az - (input$diagn.hrs * 60)
-    aa <- ifelse(aa > 0, aa, 1)
+    aa <- max(az - (input$data.hrs * 60))
     ## y-axis
     switch(input$diagn.var,
            "INTENSITY" = {
@@ -363,7 +359,7 @@ server <- function(input, output, session) {
              str.a <- "PRESSURE"
              str.b <- ""
            })
-    ## make plot
+    ## make diagnostic plot
     par(mfrow=c(2,2))
     plot(xt[aa:az], y1a[aa:az], type="b", col="darkblue",
          main=str.a, xlab="", ylab="BOX 1")
@@ -381,7 +377,7 @@ server <- function(input, output, session) {
   height=900, width=900)
 
   ## ---------------------------------------- ##
-  ## instrument flows and residence time [third panel]
+  ## instrument flows and residence time (third panel)
   df.flows <- reactive({
     ## mass flow controller calibration
     mfc1 <- (input$mfc1.set * 0.952) + 0.0036   # O3 lamp
