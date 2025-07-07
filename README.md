@@ -12,7 +12,7 @@ Requirements
 A base installation of [R](https://www.r-project.org), with the following packages:
 - [shiny](https://cran.r-project.org/web/packages/shiny)
 - [shinythemes](https://cran.r-project.org/web/packages/shinythemes)
-- [shinyFiles](https://cran.r-project.org/web/packages/shinyFiles).
+- [shinyFiles](https://cran.r-project.org/web/packages/shinyFiles)
 
 In addition, tors-viewer requires the [atmosch-R](https://github.com/rs028/atmosch-R) functions. See the related [README file](https://github.com/rs028/atmosch-R/blob/master/README.md) for instructions on how to download and install atmosch-R.
 
@@ -20,9 +20,8 @@ In addition, tors-viewer requires the [atmosch-R](https://github.com/rs028/atmos
 Installation & Execution
 ------------------------
 
-Click on the `<> Code` button to download the ZIP archive. Then, unzip it in a directory of choice. Make sure that the required libraries (see above) are installed in R. There are two ways to execute tors-viewer:
+Click on the `<> Code` button to download the ZIP archive. Then, unzip it in a directory of choice. Make sure that the required R libraries (see above) are installed. There are two ways to execute tors-viewer:
 
-1. Launch R, and set the R working directory to the tors-viewer directory. Type `runApp("app.R")` at the command prompt. This will open tors-viewer in the default browser.  
-**Note:** it may be necesary to execute `library(shiny)`, before `runApp().
+1. **with R:** launch R, and set the R working directory to the tors-viewer directory. Type `runApp("app.R")` at the command prompt. This will open tors-viewer in the default browser. Note that it may be necessary to execute `library(shiny)`, before `runApp()`.
 
-2. Open the `app.R` file in RStudio and click the **Run App** button on the toolbar. This will open tors-viewer in the Rstudio viewer pane.
+2. **with RStudio:** open the `app.R` file in RStudio and click the **Run App** button on the toolbar. This will open tors-viewer in the Rstudio viewer pane.

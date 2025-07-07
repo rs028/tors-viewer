@@ -15,7 +15,7 @@ library(shinyFiles)
 
 source("appFuncs.R")
 
-options(browser="firefox")
+#options(browser="firefox")
 
 ## ------------------------------------------------------------------ ##
 ## UI section
