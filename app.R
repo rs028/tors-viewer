@@ -11,10 +11,11 @@
 
 library(shiny)
 library(shinythemes)
+library(shinyFiles)
 
 source("appFuncs.R")
 
-#options(browser="firefox")
+options(browser="firefox")
 
 ## ------------------------------------------------------------------ ##
 ## UI section
@@ -99,7 +100,7 @@ ui <- fluidPage(theme=shinytheme("paper"),
         ),
         ## diagnostic plot window
         mainPanel(width=9,
-          plotOutput(outputId="diagnostPlot")
+          plotOutput(outputId="diagnosticPlot")
         )
       )
     ),  # --- end second panel
@@ -186,12 +187,10 @@ ui <- fluidPage(theme=shinytheme("paper"),
     tabPanel("Configuration", fluid=TRUE, br(),
       fluidRow(
         column(width=6,
-          textInput(inputId="data.dir",
-                    label="data directory:",
-                    value="~/code/tors-viewer/"),
-          textInput(inputId="expt.dir",
-                    label="experiment directory:",
-                    value="logfiles/"),
+          shinyDirButton("dataDir",
+                         "data directory",
+                         "Choose data directory"),
+          verbatimTextOutput("dataTxt", placeholder=TRUE),
           textInput(inputId="monit1",
                     label="BOX1 logfile:",
                     value="teraterm1_181201"),
@@ -228,12 +227,29 @@ ui <- fluidPage(theme=shinytheme("paper"),
 server <- function(input, output, session) {
 
   ## ---------------------------------------- ##
+  ## select data files directory
+  volumes <- c(homeDir=fs::path_home())
+
+  shinyDirChoose(input, "dataDir",
+                 roots=volumes,
+                 session=session)
+
+  output$dataTxt <- renderPrint({
+    parseDirPath(volumes, input$dataDir)
+  })
+
+  ## ---------------------------------------- ##
   ## ozone measurements and reactivity
   df.data <- reactive({
     invalidateLater(60000, session)  # update every 60 seconds
+    ## data files directory
+    data.dir <- as.character(parseDirPath(volumes, input$dataDir))
+    if (length(data.dir) == 0) {
+      data.dir <- "~/code/tors-viewer/logfiles"
+    }
     ## read data files ==>> Thermo 491 monitors, logging via teraterm
-    box1 <- fRead_Thermo(paste0(input$data.dir, input$expt.dir), input$monit1, "49i")
-    box2 <- fRead_Thermo(paste0(input$data.dir, input$expt.dir), input$monit2, "49i")
+    box1 <- fRead_Thermo(paste0(data.dir, "/"), input$monit1, "49i")
+    box2 <- fRead_Thermo(paste0(data.dir, "/"), input$monit2, "49i")
     df.box <- merge(box1, box2, by="Datetime", suffixes=c("_1","_2"))
     ## calculate ozone reactivity
     df.box$delta <- df.box$o3_1 - df.box$o3_2  # difference between box1 and box2
@@ -291,7 +307,7 @@ server <- function(input, output, session) {
     y3 <- df.data()$reactivity
     y4 <- df.data()$ratio
     y5 <- df.data()$delta
-    ## make data plot
+    ## plot data
     par(mfrow=c(4,1))
     plot(xt[aa:az], y3[aa:az], type="b", col="darkgreen",
          ylim=c(as.numeric(input$react.min),as.numeric(input$react.max)),
@@ -320,7 +336,7 @@ server <- function(input, output, session) {
 
   ## ---------------------------------------- ##
   ## diagnostic plots (second panel)
-  output$diagnostPlot <- renderPlot({
+  output$diagnosticPlot <- renderPlot({
     ## x-axis
     xt <- df.data()$Datetime
     az <- nrow(df.data())
@@ -359,7 +375,7 @@ server <- function(input, output, session) {
              str.a <- "PRESSURE"
              str.b <- ""
            })
-    ## make diagnostic plot
+    ## plot diagnostics
     par(mfrow=c(2,2))
     plot(xt[aa:az], y1a[aa:az], type="b", col="darkblue",
          main=str.a, xlab="", ylab="BOX 1")
